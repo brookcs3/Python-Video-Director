@@ -1,0 +1,87 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Video Files (too large for git)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.flv
+*.wmv
+*.m4v
+
+# AI Models (large binary files)
+*.onnx
+*.pt
+*.pth
+*.h5
+*.pb
+*.tflite
+
+# Output/Processing Files
+*_censored*
+*_output*
+processed_*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Temporary Files
+/tmp/
+*.tmp
+*.temp
+*.log
+
+# Config Files (auto-generated, may contain paths)
+.launcher_config.json
+/tmp/nudity_censor_config.json
+
+# Test Images (can keep small PNGs, but mark large ones)
+# PM5544.png
+# PM5644.png
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Project-specific output directories
+output/
+renders/
+exports/
+
+# Backup folders (should be in archive/ instead)
+BK/
+b2/
+olderbackupscripts/
+
+# Development/test scripts (not part of main project)
+test.py
+test_*.py
+test2.py
+test4.py
+testn.py
+stest.py
+
+# Ink Simulation (separate project)
+Ink-Simulation/

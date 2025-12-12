@@ -1,0 +1,17 @@
+# Core Dependencies for Audio-Reactive Visualizer System
+# Python 3.8+
+
+# Computer Vision
+opencv-python==4.10.0.84
+
+# Audio Processing
+pyaudio==0.2.14
+librosa==0.10.2.post1
+numpy==1.26.4
+
+# AI Content Detection (Post-Processing)
+nudenet==3.4.2
+
+# Optional: Archive scripts may use these
+# Pillow==10.4.0              # Used in some postprocess scripts
+# pixelgreat==0.1.0           # CRT effects (not in main scripts)

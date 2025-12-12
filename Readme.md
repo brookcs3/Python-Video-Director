@@ -1,102 +1,156 @@
-Here is a comprehensive README.md file encapsulating our entire journey, the technical evolution, and the current state of the project. You can save this as `README.md` in your project folder.
+# Cinematic AI Audio Visualizer
 
-------
+A dual-window, audio-reactive video sampler that emulates VJ/video editing techniques in real-time, plus HDR-aware post-processing tools.
 
+---
 
+## Quick Start
 
-# Cinematic AI Audio Visualizer (24-Channel Sampler)
+### 1. Run the Dual Visualizer
+```bash
+# Terminal 1
+python visualizer_window1.py
 
+# Terminal 2
+python visualizer_window2.py
+```
 
+### 2. Play Music Through BlackHole
+Both windows react to audio routed through BlackHole. They run different clip pools to create visual variety.
 
+### 3. Post-Processing (Optional)
+After recording your visualizer output, censor any nudity:
+```bash
+# Edit INPUT_VIDEO and OUTPUT_VIDEO paths in the script first
+python nudity_censor.py
+```
 
+---
 
-### 1. Concept & Goal
+## Main Scripts
 
+| Script | Purpose |
+|--------|---------|
+| `visualizer_window1.py` | Primary visualizer window - clips 59/60 play once ever |
+| `visualizer_window2.py` | Secondary visualizer window - clip 62 plays once ever |
+| `nudity_censor.py` | HDR-aware video post-processor using NudeNet AI |
 
+---
 
-The primary goal of this project is to move beyond standard "frequency-bar" music visualization and create a system that emulates **human video editing and VJing techniques** in real-time.
+## How It Works
 
-Instead of simply flashing lights to a beat, this tool acts as a **Non-Linear Video Sampler**. It utilizes a bank of 24 related video clips (variations of the same visual theme) and "remixes" them live. The system aims to balance **Chaos** (rapid, glitch-heavy reactions to high-energy audio) with **Flow** (cinematic, uninterrupted playback), mimicking professional editing pacing.
+### The Visualizer
+- **62 video clips** in a "deck" that shuffles and plays through without repeats
+- **Audio analysis** via Librosa: onset detection, sub-bass, hi-hats, chroma/key changes
+- **Chaos/Flow modes**: Rapid cuts vs. sustained playback, controlled by a "Director" algorithm
+- **Elastic time**: Hi-hats trigger rewind, kicks trigger fast-forward
+- **FX**: RGB channel separation ("haze") and inversion on heavy transients
 
+### The Post-Processor
+- Uses NudeNet AI to detect and pixelate/blur sensitive content
+- HDR-aware: preserves 10-bit color data and Dolby Vision metadata
+- Configurable censor style: pixelate, blur, or black box
 
+---
 
-### 2. Current Progress (The "Refined Dynamic" Build)
+## Installation
 
+### 1. Clone the Repository
+```bash
+git clone https://github.com/YOUR_USERNAME/VideoDir.git
+cd VideoDir
+```
 
+### 2. Create Virtual Environment (for post-processing)
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-We are currently running the **Refined Dynamic Threshold Script**. This version solves previous issues of "hyper-activity" and random triggering by implementing:
+### 3. Download the AI Model
+The nudity detection model (~40MB) is not included in the repo. Download from:
+- [NudeNet 640m.onnx](https://github.com/notAI-tech/NudeNet/releases)
 
-- **Dynamic Audio Thresholds:** The system calculates a "rolling average" of volume over the last second. Triggers (Kicks/Hats) only fire if the current sound is significantly louder (e.g., 1.2x) than that average, allowing the visualizer to adapt to both quiet intros and loud drops automatically.
-- **Strict "Fairness" Deck:** The sampler tracks every clip played. It forces a rotation through all 24 clips before allowing any repeats, ensuring the full breadth of the visual library is used.
-- **The "Director" Engine:** A pacing algorithm that randomly switches between "Chaos Mode" (reactive cutting) and "Flow Mode" (forced sustain), preventing viewer fatigue.
-- **Cooldown Logic:** A hard limit (0.5s) on clip switching to prevent the "strobe light" effect during rapid-fire drum rolls.
+Place it in the `models/` folder:
+```
+VideoDir/
+├── models/
+│   └── 640m.onnx      # <-- Put model here
+├── clips/             # Video clips go here
+├── launcher.py
+└── ...
+```
 
+### 4. Audio Routing (macOS)
+Install [BlackHole 2ch](https://existential.audio/blackhole/) for audio loopback.
 
+## Requirements
 
-### 3. Techniques & Methods
+**Python 3.8+** with dependencies in `requirements.txt`:
+```
+opencv-python
+pyaudio
+librosa
+numpy
+nudenet
+```
 
+**FFmpeg** (required for HDR video processing):
+```bash
+brew install ffmpeg
+```
 
+**Audio Routing:** macOS BlackHole 2ch (or similar loopback) as input device.
 
-This project relies on a hybrid of Computer Vision and Digital Signal Processing (DSP).
+**Video Files:** 62 clips in `clips/` folder:
+- `clips/grok-video-d481b7fd-0998-4b3b-82cc-c9e2a5c1aade.mp4`
+- `clips/grok-video-d481b7fd-0998-4b3b-82cc-c9e2a5c1aade-2.mp4`
+- ... through `-62.mp4`
 
-**The Tech Stack:**
+---
 
-- **Python:** Core logic.
-- **Librosa:** Advanced audio feature extraction (Mel Spectrograms, Onset Strength, Chroma/Key Analysis).
-- **OpenCV (cv2):** Real-time video manipulation and rendering.
-- **PyAudio:** Real-time audio stream capture (via BlackHole).
+## Configuration
 
-**Key Algorithms:**
+### Visualizer Tuning (in script)
+- `ONSET_THRESHOLD`: Sensitivity for beat-triggered cuts (lower = more cuts)
+- `FLOW_INTERVAL`: Seconds before Director considers a break from chaos
+- `FLOW_DURATION`: How long "flow" (no-cut) periods last
 
-- **Mel-Spectrogram Analysis:** separating audio into **Sub-Bass** (Kick) and **High-Frequency** (Hat) bands to trigger different visual effects.
-- **Chroma Similarity:** Detecting harmonic changes (chord progressions). A significant drop in harmonic similarity triggers a "Scene Cut."
-- **Elastic Time:** Playback speed is not linear. High-hats trigger negative speed (Rewind), while Kicks trigger positive acceleration (Fast Forward).
-- **RGB Haze:** A custom glitch effect that separates the Red and Blue channels and offsets them horizontally based on the intensity of the transient (Kick drum).
+### Post-Processor Settings (in script)
+- `CENSOR_STYLE`: "pixelate", "blur", or "black"
+- `DETECTION_THRESHOLD`: AI confidence threshold (lower = more aggressive)
+- `HDR_ENABLED`: Toggle HDR brightness recovery for detection
 
+---
 
+## Archive
 
-### 4. Project History (Evolution)
+Old iterations preserved in `archive/` with meaningful names:
 
+```
+archive/
+├── visualizer/
+│   ├── 01_basic_visualizer.py
+│   ├── 02_strict_shuffle.py
+│   ├── ...
+│   ├── 18_wildcard_song_triggers.py
+│   └── 22_rc_clip_62_only.py
+│
+└── postprocess/
+    ├── advanced_hdr_ffmpeg_pipeline.py  (FFmpeg + pixelgreat CRT effects)
+    ├── censor_iteration.py
+    └── pixelgreat_crt_test.py
+```
 
+---
 
-- **v1 (The Pulse):** Simple volume detection. The entire video flashed brightness based on global loudness.
-- **v2 (Frequency Split):** We introduced `FFT` to separate Bass (Red) from Treble (Blue).
-- **v3 (The Glitch):** Introduced "Slicing" and "Artifacting" to mimic Chris Cunningham/Aphex Twin aesthetics.
-- **v4 (The Sampler):** Moved from single-video manipulation to a **Video Bank** of 24 clips, allowing the script to "jump" between files.
-- **v5 (Librosa & Features):** Switched from basic FFT to Librosa to detect *musical features* (Key changes, transients) rather than just volume.
-- **v6 (The Director):** Added logic to force "Long Takes" to emulate traditional editing flow.
-- **v7 (Current):** Refined math from "Fixed Thresholds" to "Relative Dynamic Thresholds" and added strict cooldowns for a polished, professional output.
+## Project Evolution
 
-
-
-### 5. Setup & Requirements
-
-
-
-**Prerequisites:**
-
-- **Audio Routing:** macOS **BlackHole 2ch** (or similar loopback driver) set as the input device.
-
-- **Python Libraries:**
-
-  Bash
-
-  ```
-  pip install opencv-python pyaudio numpy librosa
-  ```
-
-File Structure:
-
-The script expects 24 video files in a specific naming convention:
-
-1. `filename.mp4` (Base file)
-2. `filename-2.mp4`
-3. `...`
-4. `filename-24.mp4`
-
-**Key Tuning Parameters (in the script):**
-
-- `KICK_SENSITIVITY`: How much louder than the average the bass must be to trigger a fast-forward/glitch.
-- `HAT_SENSITIVITY`: How much louder than the average the highs must be to trigger a rewind.
-- `FLOW_INTERVAL`: Seconds before the "Director" considers taking a break from the chaos.
-- `CLIP_SWITCH_COOLDOWN`: Minimum time between video cuts (prevents flickering).
+1. **v1-v3**: Basic pulse/frequency visualization
+2. **v4**: Video bank sampler (multiple clips)
+3. **v5**: Librosa audio features (key changes, transients)
+4. **v6**: Director algorithm (chaos/flow pacing)
+5. **v7**: Dynamic thresholds, strict deck fairness
+6. **v8**: Dual-window with once-ever special clips
+7. **Current**: Refined tuning + HDR post-processing pipeline
