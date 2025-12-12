@@ -11,8 +11,8 @@ venv/
 ENV/
 env/
 
-# Video Files (too large for git)
-*.mp4
+# Video Files (exclude large/output files, but keep clips/)
+# *.mp4  # Commented out - clips are small enough for git
 *.mov
 *.avi
 *.mkv
