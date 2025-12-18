@@ -107,12 +107,13 @@ class VideoExporter:
             return True
         except BrokenPipeError:
             print("[VideoExporter] Error: FFmpeg pipe broke!")
-            self.recording = False
+            # Ensure the FFmpeg process is properly cleaned up
+            self.stop()
             return False
 
     def stop(self):
         """Stop recording and finalize the video file."""
-        if not self.recording or self.process is None:
+        if self.process is None:
             return
 
         self.process.stdin.close()
