@@ -233,9 +233,21 @@ class AudioAnalyzer: ObservableObject {
     }
 
     private func frequencyToBinRange(lowHz: Double, highHz: Double, binWidth: Double) -> Range<Int> {
-        let lowBin = max(0, Int(lowHz / binWidth))
-        let highBin = min(magnitudes.count - 1, Int(highHz / binWidth))
-        return lowBin..<max(lowBin + 1, highBin)
+        // Compute candidate bin indices for a half-open range [lowBin, highBinExclusive)
+        var lowBin = Int(floor(lowHz / binWidth))
+        var highBinExclusive = Int(ceil(highHz / binWidth))
+
+        // Clamp to valid bounds for magnitudes indices
+        let maxIndex = magnitudes.count
+        lowBin = max(0, min(lowBin, maxIndex))
+        highBinExclusive = max(0, min(highBinExclusive, maxIndex))
+
+        // If there is no overlap with available bins, return an empty range
+        guard lowBin < highBinExclusive else {
+            return 0..<0
+        }
+
+        return lowBin..<highBinExclusive
     }
 
     private func averageMagnitude(in range: Range<Int>) -> Float {
