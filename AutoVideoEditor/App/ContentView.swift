@@ -152,11 +152,9 @@ struct ContentView: View {
     }
 
     private func startAudioAnalysis() {
-        do {
-            try audioAnalyzer.start()
-        } catch {
-            print("Failed to start audio analysis: \(error)")
-        }
+        // Audio analysis is now driven by the video playback pipeline (via AVPlayer
+        // audio taps) rather than from the microphone/system input. This method is
+        // intentionally left empty to avoid starting microphone-based analysis here.
     }
 }
 
