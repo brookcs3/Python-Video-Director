@@ -207,13 +207,24 @@ struct DirectorModeIndicator: View {
 struct AudioLevelsView: View {
     @ObservedObject var analyzer: AudioAnalyzer
 
+    // Expected dB range from the analyzer (e.g. output of vDSP_vdbcon)
+    private let minDb: Float = -96.0
+    private let maxDb: Float = 0.0
+
+    private func normalizedLevel(_ dbValue: Float) -> Float {
+        // Clamp to the expected dB range
+        let clamped = max(minDb, min(dbValue, maxDb))
+        // Map [-96, 0] dB -> [0, 1]
+        return (clamped - minDb) / (maxDb - minDb)
+    }
+
     var body: some View {
         HStack(spacing: 8) {
-            LevelBar(label: "Sub", value: analyzer.subBassLevel / 100, color: .red)
-            LevelBar(label: "Bass", value: analyzer.bassLevel / 100, color: .orange)
-            LevelBar(label: "Mid", value: analyzer.midLevel / 100, color: .yellow)
-            LevelBar(label: "Hi", value: analyzer.hiHatLevel / 100, color: .green)
-            LevelBar(label: "Flux", value: analyzer.spectralFlux / 10, color: .blue)
+            LevelBar(label: "Sub", value: normalizedLevel(analyzer.subBassLevel), color: .red)
+            LevelBar(label: "Bass", value: normalizedLevel(analyzer.bassLevel), color: .orange)
+            LevelBar(label: "Mid", value: normalizedLevel(analyzer.midLevel), color: .yellow)
+            LevelBar(label: "Hi", value: normalizedLevel(analyzer.hiHatLevel), color: .green)
+            LevelBar(label: "Flux", value: normalizedLevel(analyzer.spectralFlux), color: .blue)
         }
     }
 }
