@@ -206,8 +206,15 @@ class VideoSegmenter: ObservableObject {
 
     /// Filter and sort cut points to ensure valid clip durations
     private func filterCutPoints(_ points: [CMTime], duration: CMTime) -> [CMTime] {
-        // Remove duplicates and sort
-        var unique = Array(Set(points)).sorted { CMTimeCompare($0, $1) < 0 }
+        // Remove duplicates (based on CMTimeCompare) and sort
+        let sortedPoints = points.sorted { CMTimeCompare($0, $1) < 0 }
+        var unique: [CMTime] = []
+        for point in sortedPoints {
+            if let last = unique.last, CMTimeCompare(point, last) == 0 {
+                continue
+            }
+            unique.append(point)
+        }
 
         // Filter to ensure minimum clip duration
         var filtered: [CMTime] = [.zero]
